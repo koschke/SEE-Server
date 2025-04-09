@@ -143,7 +143,6 @@ public class ContainerService {
                 .maxConnections(100)
                 .connectionTimeout(Duration.ofSeconds(30))
                 .responseTimeout(Duration.ofSeconds(45))
-                //                .sslConfig(sslConfig)
                 .build();
 
         this.dockerClient = DockerClientImpl.getInstance(config, httpClient);
