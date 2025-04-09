@@ -8,25 +8,26 @@ services:
     ports:
       - "80:80"
       # Uncomment this line to enable the traefik dashboard
-      - "8080:8080"
+      # - "8080:8080"
+      # Uncomment this line to enable HTTPS
+      # - "443:443"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
 
   frontend:
     build: ./Frontend
-    container_name: see-frontend
     restart: always
     image: ghcr.io/uni-bremen-agst/see-manager-frontend:1.0.0
     depends_on:
       - backend
       - traefik
-    environment:
-      # Backend API URL
-      VITE_APP_API_URL: http://see.localhost/api/v1/
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.frontend.rule=Host(`${DOMAIN_NAME}`) && !PathPrefix(`/api`)"
       - "traefik.http.services.frontend.loadbalancer.server.port=8080"
+      # Uncomment this line to enable HTTPS
+      #- "traefik.http.routers.blog.tls=true"
+      #- "traefik.http.routers.${NAME}.tls.certresolver=letsencrypt"
     networks:
       - traefik
       - default
@@ -34,14 +35,12 @@ services:
   backend:
     privileged: true
     build: ./Backend
-    container_name: see-backend
     image: ghcr.io/uni-bremen-agst/see-manager-backend:1.0.0
     restart: always
     depends_on:
       - traefik
     volumes:
       - backend-data:/see
-      # - /var/run/docker.sock:/var/run/docker.sock
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
       # You should not change these values here.
@@ -60,12 +59,15 @@ services:
       JWT_SECRET: ${JWT_SECRET}
       JWT_EXPIRATION: ${JWT_EXPIRATION}
       # This will add an admin account to the backend. Use with care!
-      ADD_ADMIN_NAME: admin
-      ADD_ADMIN_PASSWORD: admin
+      ADD_ADMIN_NAME: ${INITIAL_ADMIN_USERNAME}
+      ADD_ADMIN_PASSWORD: ${INITIAL_ADMIN_PASSWORD}
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.backend.rule=Host(`${DOMAIN_NAME}`) && PathPrefix(`/api`)"
       - "traefik.http.services.backend.loadbalancer.server.port=8080"
+      # Uncomment this line to enable HTTPS
+      #- "traefik.http.routers.blog.tls=true"
+      #- "traefik.http.routers.${NAME}.tls.certresolver=letsencrypt"
     networks:
       - traefik
       - default
