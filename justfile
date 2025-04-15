@@ -2,7 +2,6 @@
 @default:
   just --list
 
-
 [working-directory: 'Backend']
 start-backend-dev:
     ./mvnw spring-boot:start
