@@ -1,91 +1,90 @@
 # SEE Managed Server
 
-This is the management server for SEE, consisting of a backend and a frontend project.
+## Table of Contents
+- [About this Project](#about-this-project)
+- [Built with](#built-with)
+- [Getting Started](#getting-started)
+  - [Prerequisites](#prerequisites)
+  - [Environment Variables](#environment-variables)
+  - [Run Locally](#run-locally)
+  - [Security Considerations](#security-considerations)
+- [Deployment](#deployment)
+- [Usage](#usage)
+- [Documentation](#documentation)
+
+
+## About this Project
+This is the management server for [SEE](https://github.com/uni-bremen-agst/SEE), consisting of a backend and a frontend project.
 
 The management server can be used to configure, run, and stop SEE game server instances.
 Additionally, it provides an API to store and retrieve files for the use in multiple connected SEE clients.
 
+## Built with
 
---------------------------------------------------------------------------------
-## Documentation
-
-Both subprojects have their own README file in their respective subfolders, which comes with additional information.
-
-Keep the information collected here and in the READMEs of the subprojects up-to-date, and update them in a timely fashion, at the latest before merging the development branch back into the main branch.
-
-Please feel free to add additional info whenever you change anything that is covered in this document, or whenever you overcome hurdles and would have liked to have found the information here in the first place.
+* [![React][React.js]][React-url]
+* [![Vite][Vite]][Vite-url]
+* [![Spring Boot][Springboot]][Springboot-url]
+* [![Traefik][Traefik]][Traefik-url]
 
 
---------------------------------------------------------------------------------
-## Dependencies
+[React.js]: https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB
+[React-url]: https://reactjs.org/
 
-The Management Server stack requires additional services during runtime:
+[Springboot]: https://img.shields.io/badge/Spring%20Boot-6DB33F?logo=springboot&style=for-the-badge&logoColor=fff
+[Springboot-url]: https://spring.io/projects/spring-boot
 
-- Docker or Podman containerization framework
+[Traefik]: https://img.shields.io/badge/Traefik-24A1C1?style=for-the-badge&logo=traefikproxy&logoColor=black
+[Traefik-url]: https://traefik.io/
 
-The stack can be run using Podman/Docker Compose.
-A `compose.yaml` file is provided for this purpose.
+[Vite]: https://img.shields.io/badge/Vite-B73BFE?style=for-the-badge&logo=vite&logoColor=FFD62E
+[Vite-url]: https://vitejs.dev/
 
-Read sections *Development Environment* and *Production Environment* for additional information.
+## Getting Started
 
-
---------------------------------------------------------------------------------
-## Development Environment
-
-### Containers
-
-It is necessary to set up a container environment in order to:
-
-- run the Management stack via Compose
-- allow the Management backend to spawn SEE game server instances
-
-Before you install Docker or Docker Desktop, consider this:
-
-- Any user who has access to the Docker daemon will potentially have **complete root/admin access** to your machine.
-- Allowing your user to control Docker (e.g., by adding it to group `docker`) opens a large attack surface. **Any program or script can instantly become root/admin on your system.**
-
-To mitigate this, consider using Podman instead and [configure it to work in rootless mode](https://wiki.archlinux.org/title/Podman#Rootless_Podman).
-
-To make Podman available via socket, it is necessary to enable the SystemD User Unit:
-
-```
-systemctl --user enable podman.socket
-systemctl --user start podman.socket
+### Prerequisites
++ A Linux based machine (or WSL2)
++ Docker (or Podman) need to be installed (https://www.docker.com/)
++ (Optional) Install [just](https://github.com/casey/just)
+  + You can view all available commands with:
+```bash 
+just
+# or
+just --list
 ```
 
-It should automatically propagate the socket via environment.
-Check using `echo "$DOCKER_HOST"` if unsure. Also check that the `.sock` file exists.
+### Environment Variables
+To run this project, you will need to configure the following environment variables in the projects .env file.
 
-**Heads up:** This means, the backend will automatically find your Podman instance and use it to spawn containers.
-
-
-### Database
-
-SQLite database files can be inspected using [DB Browser for SQLite](https://sqlitebrowser.org/).
-
-
---------------------------------------------------------------------------------
-## Production Environment
-
-At the current state, the management server is not optimized for production environments.
-
-Please refer to the *Security Considerations* in the backend README for additional information.
+| Variable | Description |
+| -------- | ------- |
+| DOMAIN_NAME | Domain under which the frontend/backend should be served |
+| EXTERNAL_PORT | Port to expose the compose stack (default: 80) |
+| DOCKER_HOST | Docker host address used to spawn new server instances |
+| DOCKER_HOST_EXTERNAL | Public IPv4 address to register the game server |
+| DOCKER_IMAGE_NAME | Docker image of the game server |
+| JWT_SECRET | Secret used to sign auth tokens |
+| JWT_EXPIRATION | Duration of token validity |
+| INITIAL_ADMIN_USERNAME | Initial admin username |
+| INITIAL_ADMIN_PASSWORD | Initial admin password |
 
 
-### HTTPS
-
-The management server as provided here does not implement HTTPS.
-You are strongly advised to set up a reverse proxy and only provide TLS-secured access.
-
-Add `secure` flag to cookies so that they are only transferred over HTTPS.
-Using nginx `proxy_pass`, you would add something like this:
-
+You can generate a new random JWT secret using the following (requires OpenSSL):
+```console
+just seed .env
 ```
-proxy_cookie_flags ~ secure;
-```
+**Important:**
+Make sure to update the JWT secret before using the server in production.
 
+**Environment Setup Tips:**
++ DOMAIN_NAME must resolve to the machine hosting the server.
++ EXTERNAL_PORT must be accessible over the network.
++ DOCKER_HOST_EXTERNAL must be a valid, reachable IPv4 address.
++ For Podman, ensure DOCKER_HOST points to the socket (usually under /var/run/user/$UID/podman/podman.sock).
 
-### Containerization
+### Run Locally
+See the README.md files in the Frontend and Backend directories for detailed local setup instructions.
+
+#### Security Considerations
 
 The backend – by default – has complete access to the Docker server it is running on.
 Being able to launch any container means, it can potentially manipulate anything on the server.
@@ -93,51 +92,56 @@ If the backend itself is compromised, the complete server is also.
 
 This can be mitigated by either:
 
-- Running the backend or the complete stack in a VM.
-- Giving the backend access to a separate Docker instance.
+- **Use a VM**: Running the backend or the complete stack in a VM.
+- **Use a separate Docker host:** Giving the backend access to a separate Docker instance.
   - Set up a separate machine or VM to provide a Docker host for the game servers and configure the backend to use this instead.
-- Use Podman in rootless mode.
+-  **[Use Podman in rootless mode](https://wiki.archlinux.org/title/Podman#Rootless_Podman)**.
   - This will usually prevent the frontend to open port 80, which should be no problem as a reverse proxy with HTTPs should be used, anyway.
-  - See above for additional information on how to achieve this.
-
 
 ### Deployment
+#### 1. Clone the project
 
-Deployment is intended to be done using Podman or Docker.
-
-Please read the `compose.yaml` carefully and adapt the configuration for your needs,
-especially for public/production setups!
-
-The container stack can be run from `Server` directory using `podman-compose` or `docker-compose`.  
-
-To build the containers, you can use:
-
-```
-podman-compose build
+```bash
+git clone https://github.com/koschke/SEE-Server
+cd SEE-Server
 ```
 
-Use `--no-cache` parameter to force a rebuild.
-
-To run the container stack, use:
-
-```
-podman-compose up
-```
-
-Use `-d` parameter to run in detached mode.
-
-The following command stops and cleans up the container setup:
-
-```
-podman-compose down
+#### 2. Pull Docker Images
+```bash
+docker compose pull
+# or using just
+just pull-images
 ```
 
-#### Configuration
+You also need to pull the actual SEE game server image:
+```bash
+$ docker pull ghcr.io/uni-bremen-agst/see-gameserver:1.0.2
+```
 
-You can edit the compose file to configure many options.
+#### 3. Start the Server
 
-Read the backend README for security considerations and change `JWT_SECRET` to a unique random secret.
+This project uses [Traefik](https://traefik.io/traefik/) as a reverse proxy. By default, it exposes services on port 80.
 
+To enable SSL:
+- Uncomment the relevant sections in compose.yaml
+- Refer to [Traefik TLS Docs](https://doc.traefik.io/traefik/https/tls/)
+- For automatic certs, use [Let's Encrypt](https://doc.traefik.io/traefik/https/acme/).
+
+To start the server:
+```console
+docker compose up -d
+# or
+just start
+```
+Then visit the configured domain in your browser.
+
+#### 4. Stop the Server
+
+```bash
+docker compose down
+# or
+just down
+```
 
 --------------------------------------------------------------------------------
 ## Usage
@@ -170,3 +174,11 @@ which is automatically loaded by the SEE clients after connecting to the server 
 
 Each of the above Code City directories should be individually zipped.
 You can either zip the directories' contents or the folder itself.
+--------------------------------------------------------------------------------
+## Documentation
+
+Both subprojects have their own README file in their respective subfolders, which comes with additional information.
+
+Keep the information collected here and in the READMEs of the subprojects up-to-date, and update them in a timely fashion, at the latest before merging the development branch back into the main branch.
+
+Please feel free to add additional info whenever you change anything that is covered in this document, or whenever you overcome hurdles and would have liked to have found the information here in the first place.
