@@ -12,7 +12,7 @@ services:
       # Uncomment this line to enable HTTPS
       # - "443:443"
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+      - ${DOCKER_HOST}:/var/run/docker.sock
 
   frontend:
     build: ./Frontend
@@ -41,7 +41,7 @@ services:
       - traefik
     volumes:
       - backend-data:/see
-      - /var/run/docker.sock:/var/run/docker.sock
+      - ${DOCKER_HOST}:/var/run/docker.sock
     environment:
       # You should not change these values here.
       # Use the env file instead
