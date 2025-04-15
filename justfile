@@ -23,7 +23,7 @@ up *ARGS:
 down *ARGS:
     docker compose down {{ARGS}}
 
-# Buildss the SEE-Manager docker images locally
+# Builds the SEE-Manager docker images locally
 containerize SERVICE="" *ARGS="":
     docker compose build {{ARGS}} {{SERVICE}}
 
