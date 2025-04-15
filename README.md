@@ -115,7 +115,7 @@ just pull-images
 
 You also need to pull the actual SEE game server image:
 ```bash
-$ docker pull ghcr.io/uni-bremen-agst/see-gameserver:1.0.0
+$ docker pull ghcr.io/uni-bremen-agst/see-gameserver:1.0.2
 ```
 
 #### 3. Start the Server

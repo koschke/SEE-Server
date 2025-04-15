@@ -30,4 +30,4 @@ containerize SERVICE="" *ARGS="":
 # Pulls the docker images for the SEE-Manager and the SEE-Gameserver
 pull-images:
     docker compose pull
-    docker pull ghcr.io/uni-bremen-agst/see-gameserver:1.0.0
+    docker pull ghcr.io/uni-bremen-agst/see-gameserver:1.0.2
