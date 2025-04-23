@@ -13,6 +13,7 @@ import de.unibremen.swt.see.manager.model.User;
 import de.unibremen.swt.see.manager.repository.ConfigRepository;
 import de.unibremen.swt.see.manager.repository.ServerRepository;
 import de.unibremen.swt.see.manager.util.ServerLockManager;
+import io.livekit.server.AccessToken;
 import jakarta.persistence.EntityNotFoundException;
 import java.io.IOException;
 import java.security.SecureRandom;
@@ -122,6 +123,20 @@ public class ServerService {
     public Server get(UUID id) {
         log.info("Fetching server {}", id);
         return serverRepo.findById(id).orElse(null);
+    }
+
+    /**
+     * Retrieves a LiveKit access token for a specific server ID.
+     *
+     * @param id the ID of the server
+     * @return the LiveKit token to access the server-specific session
+     */
+    @Transactional(readOnly = true)
+    public AccessToken getLiveKitToken(UUID id) {
+        log.info("Fetching server {}", id);
+        // TODO The LiveKit token should be bound to a server-specific session
+        // TODO Collect secrets from configuration environment
+        return new AccessToken("apiKey", "secret");
     }
 
     /**
