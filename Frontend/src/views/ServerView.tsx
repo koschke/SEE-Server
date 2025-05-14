@@ -14,6 +14,7 @@ import { enqueueSnackbar } from "notistack";
 import { AxiosError } from "axios";
 import AppUtils from "../utils/AppUtils";
 import { MuiFileInput } from "mui-file-input";
+import SelectCodeCityTypeDialog from "../components/SelectCodeCityTypeDialog";
 
 function getServerStatus(serverStatus: string) {
     switch (serverStatus) {
@@ -135,36 +136,12 @@ function ServerView() {
 
     return (
         <Container sx={{ padding: "3em" }}>
-
-            <Modal
-                open={fileTypeModalOpen}
-                onClose={() => setFileTypeModalOpen(false)}
-                aria-labelledby="remove-user-modal-title"
-                aria-describedby="remove-user-modal-description">
-                <Box sx={modalStyle}>
-                    <Typography id="modal-title" variant="h6" sx={{ marginBottom: "6pt" }}>
-                        Select Code City Type
-                    </Typography>
-                    <Stack direction="column" spacing={1}>
-                        {availableProjectTypes.filter(([, active]) => active === true).map(([projectType]) =>
-                            <Button key={projectType} variant="contained" color="primary"
-                                sx={{ borderRadius: "25px", width: "100%" }} onClick={() => {
-                                    setFileTypeModalOpen(false);
-                                    addFile(projectType);
-                                }}>
-                                {ProjectTypeUtils.getLabel(projectType)}
-                            </Button>
-                        )}
-                    </Stack>
-                    <Stack justifyContent="end" direction="row" spacing={2} sx={{ marginTop: "2em" }}>
-                        <Button variant="contained" color="secondary" sx={{ borderRadius: "25px" }}
-                            onClick={() => setFileTypeModalOpen(false)}>
-                            Cancel
-                        </Button>
-                    </Stack>
-                </Box>
-            </Modal>
-
+            <SelectCodeCityTypeDialog isOpen={fileTypeModalOpen} onClose={(projectType) => {
+                setFileTypeModalOpen(false);
+                if (projectType) {
+                    addFile(projectType);
+                }
+            }} />
             <Modal
                 open={showDeleteServerModal}
                 onClose={() => setShowDeleteServerModal(false)}

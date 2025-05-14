@@ -11,6 +11,7 @@ import { AuthContext } from "../contexts/AuthContext";
 import ProjectType, { ProjectTypeUtils } from "../types/ProjectType";
 import SeeFile from "../types/SeeFile";
 import AppUtils from "../utils/AppUtils";
+import SelectCodeCityTypeDialog from "../components/SelectCodeCityTypeDialog";
 
 const modalStyle = {
   position: 'absolute',
@@ -102,30 +103,12 @@ function CreateServerView() {
 
   return (
     <Container sx={{ padding: "3em" }}>
-      <Modal
-        open={fileTypeModalOpen}
-        onClose={() => setFileTypeModalOpen(false)}
-        aria-labelledby="remove-user-modal-title"
-        aria-describedby="remove-user-modal-description">
-        <Box sx={modalStyle}>
-          <Typography id="modal-title" variant="h6" sx={{ marginBottom: "6pt" }}>
-            Select Code City Type
-          </Typography>
-          <Stack direction="column" spacing={1}>
-            {availableProjectTypes.filter(([, active]) => active === true).map(([projectType]) =>
-              <Button key={projectType} variant="contained" color="primary" sx={{ borderRadius: "25px", width: "100%" }} onClick={() => { setFileTypeModalOpen(false); addFile(projectType); }}>
-                {ProjectTypeUtils.getLabel(projectType)}
-              </Button>
-            )}
-          </Stack>
-          <Stack justifyContent="end" direction="row" spacing={2} sx={{ marginTop: "2em" }}>
-            <Button variant="contained" color="secondary" sx={{ borderRadius: "25px" }} onClick={() => setFileTypeModalOpen(false)}>
-              Cancel
-            </Button>
-          </Stack>
-        </Box>
-      </Modal>
-
+      <SelectCodeCityTypeDialog isOpen={fileTypeModalOpen} onClose={(projectType) => {
+        setFileTypeModalOpen(false);
+        if (projectType) {
+          addFile(projectType);
+        }
+      }} />
       <Header />
       <Typography variant="h4">
         <Box display={"inline"} sx={{ "&:hover": { cursor: "pointer" } }}>
