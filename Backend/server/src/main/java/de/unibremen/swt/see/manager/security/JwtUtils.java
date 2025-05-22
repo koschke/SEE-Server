@@ -15,6 +15,8 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.WebUtils;
 
+import javax.crypto.SecretKey;
+
 /**
  * Utility class for generating, parsing, and validating JSON Web Tokens (JWT).
  */
@@ -50,7 +52,7 @@ public class JwtUtils {
     /**
      * The secret key used for signing and verifying JWT.
      */
-    private final Key key;
+    private final SecretKey key;
 
     /**
      * The parser used for JWT related operations.
@@ -69,8 +71,8 @@ public class JwtUtils {
      */
     public JwtUtils(@Value("${see.app.jwtSecret}") String jwtSecret) throws WeakKeyException {
         byte[] keyBytes = Decoders.BASE64.decode(jwtSecret);
-        this.key = Keys.hmacShaKeyFor(keyBytes);
-        this.jwtParser = Jwts.parserBuilder().setSigningKey(key).build();
+        this.key = Keys. hmacShaKeyFor(keyBytes);
+        this.jwtParser = Jwts.parser().verifyWith(key).build();
     }
 
     /**
