@@ -36,7 +36,8 @@ services:
       - traefik
     volumes:
       - backend-data:/see
-      - ${DOCKER_HOST}:/var/run/docker.sock
+      # Docker daemon must be reachable from backend container to spawn game servers.
+      - ${DOCKER_SOCKET}:/var/run/docker.sock
     environment:
       # You should not change these values here.
       # Use the env file instead
@@ -45,10 +46,8 @@ services:
       FRONTEND_SCHEME: HTTP
       FILESTORAGE_DIR: /see/file-storage
       SQLITE_DB_FILE: /see/database.db
-      # Docker daemon must be reachable from backend container to spawn game servers.
-      DOCKER_HOST: unix:///var/run/docker.sock
       # This is the docker host's external IP or domain. Game servers will be reachable on this host.
-      DOCKER_HOST_EXTERNAL: ${DOCKER_HOST_EXTERNAL}
+      DOCKER_EXTERNAL_HOST: ${DOCKER_EXTERNAL_HOST}
       GAME_SERVER_IMAGE: ${DOCKER_IMAGE_NAME}
       # JWT settings
       JWT_SECRET: ${JWT_SECRET}

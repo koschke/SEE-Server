@@ -63,17 +63,17 @@ just --list
 
 To run this project, you will need to configure the following environment variables in the projects .env file.
 
-| Variable               | Description                                                         |
-|------------------------|---------------------------------------------------------------------|
-| DOMAIN_NAME            | Domain under which the frontend/backend should be served            |
-| EXTERNAL_PORT          | Port to expose the compose stack (default: 80)                      |
-| DOCKER_HOST            | Docker (or podmman) host address used to spawn new server instances |
-| DOCKER_HOST_EXTERNAL   | Public IPv4 address to register the game server                     |
-| DOCKER_IMAGE_NAME      | Docker image of the game server                                     |
-| JWT_SECRET             | Secret used to sign auth tokens                                     |
-| JWT_EXPIRATION         | Duration of token validity                                          |
-| INITIAL_ADMIN_USERNAME | Initial admin username                                              |
-| INITIAL_ADMIN_PASSWORD | Initial admin password                                              |
+| Variable               | Description                                                   |
+|------------------------|---------------------------------------------------------------|
+| DOMAIN_NAME            | Domain under which the frontend/backend should be served      |
+| EXTERNAL_PORT          | Port to expose the compose stack (default: 80)                |
+| DOCKER_SOCKET          | Docker (or podmman) socket used to spawn new server instances |
+| DOCKER_EXTERNAL_HOST   | Public IPv4 address to register the game server               |
+| DOCKER_IMAGE_NAME      | Docker image of the game server                               |
+| JWT_SECRET             | Secret used to sign auth tokens                               |
+| JWT_EXPIRATION         | Duration of token validity                                    |
+| INITIAL_ADMIN_USERNAME | Initial admin username                                        |
+| INITIAL_ADMIN_PASSWORD | Initial admin password                                        |
 
 You can generate a new random JWT secret using the following (requires OpenSSL):
 
@@ -81,10 +81,10 @@ You can generate a new random JWT secret using the following (requires OpenSSL):
 just seed .env
 ```
 
-
 **Important:**
 Make sure to update the JWT secret before using the server in production.
-Also, with this configuration the backend will automatically find your Docker (or Podman) instance and use it to spawn container
+Also, with this configuration the backend will automatically find your Docker (or Podman) instance and use it to spawn
+container
 **Environment Setup Tips:**
 
 + DOMAIN_NAME must resolve to the machine hosting the server.
