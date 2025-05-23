@@ -3,11 +3,11 @@ package de.unibremen.swt.see.manager.config;
 import java.net.MalformedURLException;
 import java.net.URL;
 import lombok.extern.slf4j.Slf4j;
+import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
@@ -16,7 +16,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  * This class configures web-related components for SEE Manager.
  */
 @Configuration
-@EnableWebMvc
 @Slf4j
 public class WebConfig {
 
@@ -38,6 +37,20 @@ public class WebConfig {
      */
     @Value("${see.app.frontend.scheme}")
     private String frontendScheme;
+
+    /**
+     * Creates and sets up the OpenAPI documentation for the application.
+     *
+     * @return A {@link GroupedOpenApi} instance for API documentation
+     * @see org.springdoc.core.models.GroupedOpenApi
+     */
+    @Bean
+    public GroupedOpenApi publicApi() {
+        return GroupedOpenApi.builder()
+                .group("public")
+                .pathsToMatch("/**")
+                .build();
+    }
 
     /**
      * Creates and configures a {@code WebMvcConfigurer} for Cross-Origin
@@ -63,7 +76,7 @@ public class WebConfig {
                 if (frontendDomain == null || frontendDomain.isBlank()) {
                     throw new IllegalStateException("Frontend domain must not be empty!");
                 }
-                
+
                 String frontendUrl;
                 try {
                     // Note: Does only minimal verification
@@ -72,7 +85,7 @@ public class WebConfig {
                     throw new RuntimeException("Frontend domain and/or scheme is not properly configured!", e);
                 }
                 log.info("Using frontend URL: {}", frontendUrl);
-                
+
                 registry.addMapping("/**")
                         .allowedOrigins(frontendUrl)
                         .allowedMethods("*")

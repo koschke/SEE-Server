@@ -11,7 +11,7 @@ function LoginView() {
           justifyContent="center"
           sx={{ minHeight: '100vh' }}
         >
-          <Grid item xs={4}>
+          <Grid size={{xs: 4}}>
             <LoginForm />
           </Grid>
         </Grid>

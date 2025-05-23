@@ -1,0 +1,31 @@
+http:
+  services:
+    frontend:
+      loadBalancer:
+        servers:
+          - url: "http://frontend:8080"
+        passHostHeader: true
+    backend:
+      loadBalancer:
+        servers:
+          - url: "http://backend:8080"
+        passHostHeader: true
+
+
+  routers:
+    frontend:
+      rule: "Host(`{{env "DOMAIN_NAME"}}`) && !PathPrefix(`/api`)"
+      service: frontend
+      # Uncomment these lines to enable HTTPS
+      #      tls:
+      #        certResolver: letsencrypt
+      entryPoints:
+        - web
+    backend:
+      rule: "Host(`{{env "DOMAIN_NAME"}}`) && PathPrefix(`/api`)"
+      service: backend
+      # Uncomment these lines to enable HTTPS
+      #      tls:
+      #        certResolver: letsencrypt
+      entryPoints:
+        - web
