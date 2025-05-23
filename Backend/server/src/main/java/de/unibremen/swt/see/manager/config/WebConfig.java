@@ -38,8 +38,12 @@ public class WebConfig {
     @Value("${see.app.frontend.scheme}")
     private String frontendScheme;
 
-
-
+    /**
+     * Creates and sets up the OpenAPI documentation for the application.
+     *
+     * @return A {@link GroupedOpenApi} instance for API documentation
+     * @see org.springdoc.core.models.GroupedOpenApi
+     */
     @Bean
     public GroupedOpenApi publicApi() {
         return GroupedOpenApi.builder()

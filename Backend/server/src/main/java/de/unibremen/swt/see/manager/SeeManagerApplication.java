@@ -69,15 +69,15 @@ public class SeeManagerApplication {
      * <p>
      * Required dependencies are listed in the parameters.
      *
-     * @param newAdminName     username of an admin user that should be created
-     *                         during startup
+     * @param newAdminName username of an admin user that should be created
+     * during startup
      * @param newAdminPassword plain-text password of an admin user that should
-     * @param serverRepo       server repository dependency
-     * @param userRepo         user repository dependency
-     * @param userService      user service dependency
-     * @param fileService      file service dependency
-     * @param roleRepo         role repository dependency
-     * @param configRepo       configuration repository dependency
+     * @param serverRepo server repository dependency
+     * @param userRepo user repository dependency
+     * @param userService user service dependency
+     * @param fileService file service dependency
+     * @param roleRepo role repository dependency
+     * @param configRepo configuration repository dependency
      * @return the configured {@link CommandLineRunner}
      */
     @Bean
