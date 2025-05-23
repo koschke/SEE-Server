@@ -127,10 +127,7 @@ public class WebSecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth.requestMatchers("/api/v1/user/signin", "/swagger-ui/**", "/api-docs/**").permitAll().anyRequest().authenticated());
         // fix H2 database console: Refused to display ' in a frame because it set 'X-Frame-Options' to 'deny'
-        //http.headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin));
-
         http.authenticationProvider(authenticationProvider());
-
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
