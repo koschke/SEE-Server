@@ -12,6 +12,7 @@
     <properties>
         <!-- This should be the version used by Maven Wrapper -->
         <maven-required-version>3.9</maven-required-version>
+        <maven.compiler.release>17</maven.compiler.release>
     </properties>
 
     <modules>

@@ -23,25 +23,21 @@ Additionally, it provides an API to store and retrieve files for the use in mult
 
 ## Built with
 
-* [![React][React.js]][React-url]
-* [![Vite][Vite]][Vite-url]
-* [![Spring Boot][Springboot]][Springboot-url]
-* [![Traefik][Traefik]][Traefik-url]
+* [![React][React.js-badge]][React-url]
+* [![Vite][Vite-badge]][Vite-url]
+* [![Spring Boot][Springboot-badge]][Springboot-url]
+* [![Traefik][Traefik-badge]][Traefik-url]
 
-[React.js]: https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB
-
+[React.js-badge]: https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB
 [React-url]: https://reactjs.org/
 
-[Springboot]: https://img.shields.io/badge/Spring%20Boot-6DB33F?logo=springboot&style=for-the-badge&logoColor=fff
-
+[Springboot-badge]: https://img.shields.io/badge/Spring%20Boot-6DB33F?logo=springboot&style=for-the-badge&logoColor=fff
 [Springboot-url]: https://spring.io/projects/spring-boot
 
-[Traefik]: https://img.shields.io/badge/Traefik-24A1C1?style=for-the-badge&logo=traefikproxy&logoColor=black
-
+[Traefik-badge]: https://img.shields.io/badge/Traefik-24A1C1?style=for-the-badge&logo=traefikproxy&logoColor=black
 [Traefik-url]: https://traefik.io/
 
-[Vite]: https://img.shields.io/badge/Vite-B73BFE?style=for-the-badge&logo=vite&logoColor=FFD62E
-
+[Vite-badge]: https://img.shields.io/badge/Vite-B73BFE?style=for-the-badge&logo=vite&logoColor=FFD62E
 [Vite-url]: https://vitejs.dev/
 
 ## Getting Started
@@ -49,11 +45,11 @@ Additionally, it provides an API to store and retrieve files for the use in mult
 ### Prerequisites
 
 + A Linux based machine (or WSL2)
-+ Docker (or Podman) need to be installed (https://www.docker.com/)
++ [Docker](https://www.docker.com/get-started/) or [Podman](https://podman.io/get-started) need to be installed
 + (Optional) Install [just](https://github.com/casey/just)
     + You can view all available commands with:
 
-```bash 
+```sh 
 just
 # or
 just --list
@@ -61,13 +57,13 @@ just --list
 
 ### Environment Variables
 
-To run this project, you will need to configure the following environment variables in the projects .env file.
+To run this project, you will need to configure the following environment variables in the projects `.env` file.
 
 | Variable               | Description                                                   |
 |------------------------|---------------------------------------------------------------|
 | DOMAIN_NAME            | Domain under which the frontend/backend should be served      |
 | EXTERNAL_PORT          | Port to expose the compose stack (default: 80)                |
-| DOCKER_SOCKET          | Docker (or podmman) socket used to spawn new server instances |
+| DOCKER_SOCKET          | Docker/Podmman socket used to spawn new server instances      |
 | DOCKER_EXTERNAL_HOST   | Public IPv4 address to register the game server               |
 | DOCKER_IMAGE_NAME      | Docker image of the game server                               |
 | JWT_SECRET             | Secret used to sign auth tokens                               |
@@ -85,16 +81,17 @@ just seed .env
 Make sure to update the JWT secret before using the server in production.
 Also, with this configuration the backend will automatically find your Docker (or Podman) instance and use it to spawn
 container
+
 **Environment Setup Tips:**
 
-+ DOMAIN_NAME must resolve to the machine hosting the server.
-+ EXTERNAL_PORT must be accessible over the network.
-+ DOCKER_HOST_EXTERNAL must be a valid, reachable IPv4 address.
-+ For Podman, ensure DOCKER_HOST points to the socket (usually under /var/run/user/$UID/podman/podman.sock).
++ `DOMAIN_NAME` must resolve to the machine hosting the server.
++ `EXTERNAL_PORT` must be accessible over the network.
++ `DOCKER_HOST_EXTERNAL` must be a valid, reachable IPv4 address.
++ For Podman, ensure `DOCKER_HOST` points to the socket (usually under `/var/run/user/${UID}/podman/podman.sock` for rootless Podman).
 
 ### Run Locally
 
-See the README.md files in the Frontend and Backend directories for detailed local setup instructions.
+See the `README.md` files in the Frontend and Backend directories for detailed local setup instructions.
 
 #### Security Considerations
 
@@ -109,46 +106,58 @@ This can be mitigated by either:
     - Set up a separate machine or VM to provide a Docker host for the game servers and configure the backend to use
       this instead.
 - **[Use Podman in rootless mode](https://wiki.archlinux.org/title/Podman#Rootless_Podman)**.
-- This will usually prevent the frontend to open port 80, which should be no problem as a reverse proxy with HTTPs
-  should be used, anyway.
+  - Running containers in rootless setup will reduce the attack vector to the scope of the user executing them.
+  - Full access to the rootless Podman socket means a compromised container can do anything the user can do on the host system.
+  - Be advised that in production environments it is still a good idea to use a separate dedicated user for running the containers or even another separate user for the game server instances as well.
+  - This will usually prevent the frontend to open port 80, which should be no problem as a reverse proxy with HTTPS should be used, anyway.
 
 ### Deployment
 
 #### 1. Clone the project
 
-```bash
-git clone https://github.com/koschke/SEE-Server
+```sh
+git clone https://github.com/uni-bremen-agst/SEE-Server.git
+# or git clone git@github.com:uni-bremen-agst/SEE-Server.git
 cd SEE-Server
 ```
 
 #### 2. Pull Docker Images
 
-```bash
+```sh
 docker compose pull
+# or using Podman Compose
+podman-compose pull
 # or using just
 just pull-images
 ```
 
 You also need to pull the actual SEE game server image:
 
-```bash
-$ docker pull ghcr.io/uni-bremen-agst/see-gameserver:1.0.2
+```sh
+docker pull ghcr.io/uni-bremen-agst/see-gameserver:1.0.2
 ```
 
 #### 3. Start the Server
 
-This project uses [Traefik](https://traefik.io/traefik/) as a reverse proxy. By default, it exposes services on port 80.
+This project uses [Traefik](https://traefik.io/traefik/) as a reverse proxy.
+By default, it exposes services on port 80.
 
-To enable SSL:
+**Note:**
+This can be a problem when using rootless Podman because by default system ports (<1024) are not available for users.
+Typically, you would set `EXTERNAL_PORT` to `8080` or similar in the `.env` file and use your firewall to redirect port `80` if necessary.
 
-- Uncomment the relevant sections in compose.yaml
-- Refer to [Traefik TLS Docs](https://doc.traefik.io/traefik/https/tls/)
+To enable HTTPS:
+
+- Uncomment the relevant sections in `compose.yaml`.
+- Refer to [Traefik TLS Docs](https://doc.traefik.io/traefik/https/tls/).
 - For automatic certs, use [Let's Encrypt](https://doc.traefik.io/traefik/https/acme/).
 
 To start the server:
 
-```console
+```sh
 docker compose up -d
+# or
+podman-compose up -d
 # or
 just start
 ```
@@ -157,7 +166,7 @@ Then visit the configured domain in your browser.
 
 #### 4. Stop the Server
 
-```bash
+```sh
 docker compose down
 # or
 just down
@@ -197,6 +206,7 @@ backend.
 
 Each of the above Code City directories should be individually zipped.
 You can either zip the directories' contents or the folder itself.
+
 --------------------------------------------------------------------------------
 
 ## Documentation
