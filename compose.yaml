@@ -1,8 +1,11 @@
 services:
   traefik:
+    command:
+      - --providers.docker
+      - --providers.file.filename=/etc/traefik/dynamic.yml
     image: traefik:v2.9
     ports:
-      - "80:80"
+      - "${EXTERNAL_PORT}:80"
       # Uncomment this line to enable the traefik dashboard
       # - "8080:8080"
       # Uncomment this line to enable HTTPS

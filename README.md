@@ -46,18 +46,10 @@ Additionally, it provides an API to store and retrieve files for the use in mult
 
 + A Linux based machine (or WSL2)
 + [Docker](https://www.docker.com/get-started/) or [Podman](https://podman.io/get-started) need to be installed
-+ (Optional) Install [just](https://github.com/casey/just)
-    + You can view all available commands with:
-
-```sh 
-just
-# or
-just --list
-```
 
 ### Environment Variables
 
-To run this project, you will need to configure the following environment variables in the projects `.env` file.
+To run this project, you will need to configure the following environment variables in the projects `.env-example` file.
 
 | Variable               | Description                                                   |
 |------------------------|---------------------------------------------------------------|
@@ -70,12 +62,6 @@ To run this project, you will need to configure the following environment variab
 | JWT_EXPIRATION         | Duration of token validity                                    |
 | INITIAL_ADMIN_USERNAME | Initial admin username                                        |
 | INITIAL_ADMIN_PASSWORD | Initial admin password                                        |
-
-You can generate a new random JWT secret using the following (requires OpenSSL):
-
-```console
-just seed .env
-```
 
 **Important:**
 Make sure to update the JWT secret before using the server in production.
@@ -127,8 +113,6 @@ cd SEE-Server
 docker compose pull
 # or using Podman Compose
 podman-compose pull
-# or using just
-just pull-images
 ```
 
 You also need to pull the actual SEE game server image:
@@ -138,6 +122,13 @@ docker pull ghcr.io/uni-bremen-agst/see-gameserver:1.0.2
 ```
 
 #### 3. Start the Server
+
+You need to create a `.env` file with your configuration needed according to [this](#environment-variables).
+In `.env-example` we provide you with an example configuration.
+Simply copy the content in you own file and adjust it to your needs.
+
+> [!IMPORTANT]  
+> Remember to change the admin username and password as well as the JWT secret.
 
 This project uses [Traefik](https://traefik.io/traefik/) as a reverse proxy.
 By default, it exposes services on port 80.
@@ -155,12 +146,11 @@ To enable HTTPS:
 To start the server:
 
 ```sh
-docker compose up -d
+docker compose --env-file [YOUR_ENV_FILE] up -d
 # or
-podman-compose up -d
-# or
-just start
+podman-compose --env-file [YOUR_ENV_FILE] up -d
 ```
+Replace `YOUR_ENV_FILE` with the env file you have created.
 
 Then visit the configured domain in your browser.
 
@@ -168,8 +158,6 @@ Then visit the configured domain in your browser.
 
 ```sh
 docker compose down
-# or
-just down
 ```
 
 --------------------------------------------------------------------------------
