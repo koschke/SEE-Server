@@ -3,7 +3,7 @@ COPY . /app/
 WORKDIR /app
 RUN --mount=type=cache,id=maven,target=/maven-cache     \
   ./mvnw -Dmaven.repo.local=/maven-cache  \
-  clean package -DskipTests
+      clean package -DskipTests
 
 # ----------------------------------------------------------
 
