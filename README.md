@@ -89,9 +89,25 @@ container
 + `DOCKER_HOST_EXTERNAL` must be a valid, reachable IPv4 address.
 + For Podman, ensure `DOCKER_HOST` points to the socket (usually under `/var/run/user/${UID}/podman/podman.sock` for rootless Podman).
 
-### Run Locally
+### Run Locally for Development
 
-See the `README.md` files in the Frontend and Backend directories for detailed local setup instructions.
+To run the server localy you can build the images by yourself by running
+
+```sh
+docker compose build
+# or
+podman-compose build
+```
+
+After that start the server with:
+
+```sh
+docker compose up -d
+# or
+podman-compose up -d
+```
+
+See the `README.md` files in the Frontend and Backend directories for detailed local setup instructions if you want to run the server without docker or podman.
 
 #### Security Considerations
 
@@ -132,7 +148,7 @@ podman-compose pull
 You also need to pull the actual SEE game server image:
 
 ```sh
-docker pull ghcr.io/uni-bremen-agst/see-gameserver:1.0.2
+docker pull ghcr.io/uni-bremen-agst/see-gameserver:latest
 ```
 
 #### 3. Start the Server
