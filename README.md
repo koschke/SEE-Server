@@ -56,7 +56,7 @@ Simply copy the content in you own file and adjust it to your needs.
 
 Note that dotfiles, filenames starting with a `.`, might be hidden depending on your operating system and configuration.
 
-> [!IMPORTANT]  
+> [!IMPORTANT]<br/>
 > Remember to change the admin username and password as well as the JWT secret.
 
 | Variable                 | Description                                                   |
