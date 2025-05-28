@@ -49,19 +49,33 @@ Additionally, it provides an API to store and retrieve files for the use in mult
 
 ### Environment Variables
 
-To run this project, you will need to configure the following environment variables in the projects `.env-example` file.
+To run this project, you will need to configure the following environment variables in your local `.env` file.
 
-| Variable               | Description                                                   |
-|------------------------|---------------------------------------------------------------|
-| DOMAIN_NAME            | Domain under which the frontend/backend should be served      |
-| EXTERNAL_PORT          | Port to expose the compose stack (default: 80)                |
-| DOCKER_SOCKET          | Docker/Podmman socket used to spawn new server instances      |
-| DOCKER_EXTERNAL_HOST   | Public IPv4 address to register the game server               |
-| DOCKER_IMAGE_NAME      | Docker image of the game server                               |
-| JWT_SECRET             | Secret used to sign auth tokens                               |
-| JWT_EXPIRATION         | Duration of token validity                                    |
-| INITIAL_ADMIN_USERNAME | Initial admin username                                        |
-| INITIAL_ADMIN_PASSWORD | Initial admin password                                        |
+In `.env-example` we provide you with an example configuration.
+Simply copy the content in you own file and adjust it to your needs.
+
+Note that dotfiles, filenames starting with a `.`, might be hidden depending on your operating system and configuration.
+
+> [!IMPORTANT]  
+> Remember to change the admin username and password as well as the JWT secret.
+
+| Variable                 | Description                                                   |
+|--------------------------|---------------------------------------------------------------|
+| `DOMAIN_NAME`            | Domain under which the frontend/backend should be served      |
+| `EXTERNAL_PORT`          | Port to expose the compose stack (default: 80)                |
+| `DOCKER_SOCKET`          | Docker/Podmman socket used to spawn new server instances      |
+| `DOCKER_EXTERNAL_HOST`   | Public IPv4 address to register the game server               |
+| `DOCKER_IMAGE_NAME`      | Docker image of the game server                               |
+| `JWT_SECRET`             | Secret used to sign auth tokens                               |
+| `JWT_EXPIRATION`         | Duration of token validity                                    |
+| `INITIAL_ADMIN_USERNAME` | Initial admin username                                        |
+| `INITIAL_ADMIN_PASSWORD` | Initial admin password                                        |
+
+You can generate a new 64-bit random JWT secret using the following command:
+
+```sh
+openssl rand -base64 64
+```
 
 **Important:**
 Make sure to update the JWT secret before using the server in production.
@@ -123,12 +137,7 @@ docker pull ghcr.io/uni-bremen-agst/see-gameserver:1.0.2
 
 #### 3. Start the Server
 
-You need to create a `.env` file with your configuration needed according to [this](#environment-variables).
-In `.env-example` we provide you with an example configuration.
-Simply copy the content in you own file and adjust it to your needs.
-
-> [!IMPORTANT]  
-> Remember to change the admin username and password as well as the JWT secret.
+You need to create a `.env` file with your configuration needed according to section [Environment Variables](#environment-variables).
 
 This project uses [Traefik](https://traefik.io/traefik/) as a reverse proxy.
 By default, it exposes services on port 80.
@@ -146,11 +155,13 @@ To enable HTTPS:
 To start the server:
 
 ```sh
-docker compose --env-file [YOUR_ENV_FILE] up -d
+docker compose up -d
 # or
-podman-compose --env-file [YOUR_ENV_FILE] up -d
+podman-compose up -d
 ```
-Replace `YOUR_ENV_FILE` with the env file you have created.
+
+You can add parameter `--env-file <YOUR_ENV_FILE>` to select a specific environment file different from the default `.env`.
+Replace `<YOUR_ENV_FILE>` with the env file you have created.
 
 Then visit the configured domain in your browser.
 
