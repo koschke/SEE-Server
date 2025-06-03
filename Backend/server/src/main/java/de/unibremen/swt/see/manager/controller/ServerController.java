@@ -1,18 +1,22 @@
 package de.unibremen.swt.see.manager.controller;
 
-import de.unibremen.swt.see.manager.model.File;
-import de.unibremen.swt.see.manager.model.RoleType;
-import de.unibremen.swt.see.manager.model.Server;
-import de.unibremen.swt.see.manager.model.User;
+import de.unibremen.swt.see.manager.model.*;
 import de.unibremen.swt.see.manager.security.UserDetailsImpl;
 import de.unibremen.swt.see.manager.service.AccessControlService;
 import de.unibremen.swt.see.manager.service.ServerService;
+import de.unibremen.swt.see.manager.service.ServerSnapshotService;
 import de.unibremen.swt.see.manager.service.UserService;
 import jakarta.persistence.EntityNotFoundException;
+
 import java.io.IOException;
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
+
+import jakarta.ws.rs.Path;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -48,6 +52,11 @@ public class ServerController {
      * Used to access user data.
      */
     private final UserService userService;
+
+    /**
+     * Used to access server snapshots.
+     */
+    private final ServerSnapshotService serverSnapshotService;
 
     /**
      * Retrieves metadata of the server identified by the specified ID.
@@ -210,6 +219,64 @@ public class ServerController {
     @PreAuthorize("hasRole('ADMIN') or hasRole('USER') and @accessControlService.canAccessServer(principal.id, #id)")
     public ResponseEntity<?> getFiles(@RequestParam("id") UUID id) {
         return ResponseEntity.ok().body(serverService.getFilesForServer(id));
+    }
+
+
+    /**
+     * Retrieves all snapshots of a server.
+     *
+     * @param serverId the ID of the server
+     * @return {@code 200 Ok} if successful, or {@code 404 Not Found} if
+     * the server does not exist, or {@code 500 Internal Server Error} if an
+     * error occurs.
+     */
+    @GetMapping("/snapshots")
+    public ResponseEntity<List<ServerSnapshot>> getAllSnapshotsOfServer(@RequestParam("serverId") UUID serverId) {
+        Optional<List<ServerSnapshot>> server = serverSnapshotService.getServerSnapshots(serverId);
+
+        if (server.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(server.get());
+    }
+
+    @PostMapping(path = "/snapshots/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> createSnapshot(
+            @RequestParam("serverId") UUID serverId,
+            @RequestBody() MultipartFile file) {
+        try {
+            Server server = serverService.get(serverId);
+            if (server == null) {
+                return ResponseEntity.notFound().build();
+            }
+
+            serverSnapshotService.createServerSnapshotFromFile(serverId, file);
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (IOException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * Deletes a server snapshot by its ID.
+     *
+     * @param snapshotId the ID of the snapshot to delete
+     * @return {@code 204 No Content} if successful, or {@code 404 Not Found}
+     * if the snapshot does not exist.
+     */
+    @DeleteMapping("/{serverId}/snapshot/{snapshotId}")
+    public ResponseEntity<Void> deleteSnapshot(
+            @PathVariable("serverId") UUID serverId,
+            @PathVariable("snapshotId") UUID snapshotId) {
+        try {
+            serverSnapshotService.deleteSnapshotsById(snapshotId);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.noContent().build();
     }
 
 }
