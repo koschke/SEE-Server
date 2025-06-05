@@ -9,11 +9,11 @@
     - [Environment Variables](#environment-variables)
     - [Run Locally](#run-locally)
     - [Security Considerations](#security-considerations)
-- [Deployment](#deployment)
+- [Container Deployment](#container-deployment)
 - [Usage](#usage)
 - [Documentation](#documentation)
 
-## About this Project
+## About This Project
 
 This is the management server for [SEE](https://github.com/uni-bremen-agst/SEE), consisting of a backend and a frontend
 project.
@@ -21,7 +21,7 @@ project.
 The management server can be used to configure, run, and stop SEE game server instances.
 Additionally, it provides an API to store and retrieve files for the use in multiple connected SEE clients.
 
-## Built with
+## Built With
 
 * [![React][React.js-badge]][React-url]
 * [![Vite][Vite-badge]][Vite-url]
@@ -63,7 +63,7 @@ Note that dotfiles, filenames starting with a `.`, might be hidden depending on 
 |--------------------------|---------------------------------------------------------------|
 | `DOMAIN_NAME`            | Domain under which the frontend/backend should be served      |
 | `EXTERNAL_PORT`          | Port to expose the compose stack (default: 80)                |
-| `DOCKER_SOCKET`          | Docker/Podmman socket used to spawn new server instances      |
+| `DOCKER_SOCKET`          | Docker/Podman socket used to spawn new server instances       |
 | `DOCKER_EXTERNAL_HOST`   | Public IPv4 address to register the game server               |
 | `DOCKER_IMAGE_NAME`      | Docker image of the game server                               |
 | `JWT_SECRET`             | Secret used to sign auth tokens                               |
@@ -89,27 +89,7 @@ container
 + `DOCKER_HOST_EXTERNAL` must be a valid, reachable IPv4 address.
 + For Podman, ensure `DOCKER_HOST` points to the socket (usually under `/var/run/user/${UID}/podman/podman.sock` for rootless Podman).
 
-### Run Locally for Development
-
-To run the server localy you can build the images by yourself by running
-
-```sh
-docker compose build
-# or
-podman-compose build
-```
-
-After that start the server with:
-
-```sh
-docker compose up -d
-# or
-podman-compose up -d
-```
-
-See the `README.md` files in the Frontend and Backend directories for detailed local setup instructions if you want to run the server without docker or podman.
-
-#### Security Considerations
+### Security Considerations
 
 The backend – by default – has complete access to the Docker server it is running on.
 Being able to launch any container means, it can potentially manipulate anything on the server.
@@ -127,9 +107,16 @@ This can be mitigated by either:
   - Be advised that in production environments it is still a good idea to use a separate dedicated user for running the containers or even another separate user for the game server instances as well.
   - This will usually prevent the frontend to open port 80, which should be no problem as a reverse proxy with HTTPS should be used, anyway.
 
-### Deployment
+### Run Locally
 
-#### 1. Clone the project
+See the `README.md` files in the Frontend and Backend directories for detailed local setup instructions if you want to run the server without Docker or Podman.
+
+### Container Deployment
+
+This section describes how to download/build and run the container images via Docker or Podman.<br/>
+Make sure you have read the security considerations, especially when exposing the server to the Internet.
+
+#### 1. Clone the Project
 
 ```sh
 git clone https://github.com/uni-bremen-agst/SEE-Server.git
@@ -137,7 +124,9 @@ git clone https://github.com/uni-bremen-agst/SEE-Server.git
 cd SEE-Server
 ```
 
-#### 2. Pull Docker Images
+#### 2a. Pull Container Images
+
+To pull the Backend and Frontend images as well as the Traefik reverse proxy, execute:
 
 ```sh
 docker compose pull
@@ -145,11 +134,28 @@ docker compose pull
 podman-compose pull
 ```
 
-You also need to pull the actual SEE game server image:
+You also need to pull the actual SEE game server image which is not part of the compose file as it is indirectly spawned by the back-end container.
+This image needs to be available on the Docker/Podman instance that is made available to the Backend (cmp. `DOCKER_SOCKET`).
 
 ```sh
 docker pull ghcr.io/uni-bremen-agst/see-gameserver:latest
 ```
+
+The tags as defined in `compose.yaml` and the above command can be replaced to use specific tags in place of `latest`. Available images and tags are listed in our [container registry](https://github.com/orgs/uni-bremen-agst/packages).
+
+#### 2b. Build Container Images
+
+Alternatively, you can build the container images locally using the following commands:
+
+```sh
+docker compose build
+# or
+podman-compose build
+```
+
+Please note that the images will be created with the names defined in the compose file.
+By default, this will replace the images you might have downloaded earlier.
+(Actually, any downloaded images will stick around but the newly built images will get tagged so that they are used in place of them.)
 
 #### 3. Start the Server
 
