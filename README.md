@@ -68,8 +68,8 @@ Note that dotfiles, filenames starting with a `.`, might be hidden depending on 
 | `DOCKER_IMAGE_NAME`      | Docker image of the game server                               |
 | `JWT_SECRET`             | Secret used to sign auth tokens                               |
 | `JWT_EXPIRATION`         | Duration of token validity                                    |
-| `INITIAL_ADMIN_USERNAME` | Initial admin username                                        |
-| `INITIAL_ADMIN_PASSWORD` | Initial admin password                                        |
+| `ADD_ADMIN_USERNAME` | Initial admin username                                        |
+| `ADD_ADMIN_PASSWORD` | Initial admin password                                        |
 
 You can generate a new 64-bit random JWT secret using the following command:
 

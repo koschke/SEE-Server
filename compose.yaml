@@ -56,8 +56,8 @@ services:
       JWT_SECRET: ${JWT_SECRET}
       JWT_EXPIRATION: ${JWT_EXPIRATION}
       # This will add an admin account to the backend. Use with care!
-      INITIAL_ADMIN_USERNAME: ${INITIAL_ADMIN_USERNAME}
-      INITIAL_ADMIN_PASSWORD: ${INITIAL_ADMIN_PASSWORD}
+      ADD_ADMIN_USERNAME: ${ADD_ADMIN_USERNAME}
+      ADD_ADMIN_PASSWORD: ${ADD_ADMIN_PASSWORD}
     networks:
       - traefik
       - default
