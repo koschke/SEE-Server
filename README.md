@@ -68,19 +68,18 @@ Note that dotfiles, filenames starting with a `.`, might be hidden depending on 
 | `DOCKER_IMAGE_NAME`      | Docker image of the game server                               |
 | `JWT_SECRET`             | Secret used to sign auth tokens                               |
 | `JWT_EXPIRATION`         | Duration of token validity                                    |
-| `ADD_ADMIN_USERNAME`     | Adds an admin account with this username                      |
-| `ADD_ADMIN_PASSWORD`     | Adds an admin account with this password                      |
+| `ADD_ADMIN_USERNAME`     | Creates a new admin user account with this username           |
+| `ADD_ADMIN_PASSWORD`     | Creates a new admin user account with this password           |
 
 You can generate a new 64-bit random JWT secret using the following command:
 
 ```sh
-openssl rand -base64 64
+openssl rand -base64 64 | tr -d '\n' && echo
 ```
 
 **Important:**
 Make sure to update the JWT secret before using the server in production.
-Also, with this configuration the backend will automatically find your Docker (or Podman) instance and use it to spawn
-container
+Also note that with this configuration the backend will automatically find your Docker (or Podman) instance under `/var/run/docker.sock` and use it to spawn game server containers. You might want to use a different instance.
 
 **Environment Setup Tips:**
 
@@ -139,6 +138,8 @@ This image needs to be available on the Docker/Podman instance that is made avai
 
 ```sh
 docker pull ghcr.io/uni-bremen-agst/see-gameserver:latest
+# or using Podman
+podman pull ghcr.io/uni-bremen-agst/see-gameserver:latest
 ```
 
 The tags as defined in `compose.yaml` and the above command can be replaced to use specific tags in place of `latest`. Available images and tags are listed in our [container registry](https://github.com/orgs/uni-bremen-agst/packages).
@@ -157,7 +158,17 @@ Please note that the images will be created with the names defined in the compos
 By default, this will replace the images you might have downloaded earlier.
 (Actually, any downloaded images will stick around but the newly built images will get tagged so that they are used in place of them.)
 
-#### 3. Start the Server
+#### 3. Create Data Directory
+
+The data directory will be mounted into the Backend container to store persistent data.
+
+From the repository root, execute:
+
+```sh
+mkdir backend-data
+```
+
+#### 4. Start the Server
 
 You need to create a `.env` file with your configuration needed according to section [Environment Variables](#environment-variables).
 
@@ -185,7 +196,11 @@ podman-compose up -d
 You can add parameter `--env-file <YOUR_ENV_FILE>` to select a specific environment file different from the default `.env`.
 Replace `<YOUR_ENV_FILE>` with the env file you have created.
 
-Then visit the configured domain in your browser.
+Now you can visit the configured domain in your browser.
+
+**Note:**
+It is important to use exactly the domain and port that is configured via `DOMAIN_NAME` and `EXTERNAL_PORT` in your environment.
+For example, if you configured `DOMAIN_NAME=127.0.0.1` and `EXTERNAL_PORT=8082`, the URL is `http://127.0.0.1:8082/` and `http://localhost:8082/` won't work!
 
 #### 4. Stop the Server
 
