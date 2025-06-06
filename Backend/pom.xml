@@ -12,6 +12,7 @@
     <properties>
         <!-- This should be the version used by Maven Wrapper -->
         <maven-required-version>3.9</maven-required-version>
+        <maven.compiler.release>21</maven.compiler.release>
     </properties>
 
     <modules>
@@ -25,12 +26,12 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
-    
+
     <build>
         <plugins>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>versions-maven-plugin</artifactId>
+                <artifactId>versions-maven-plugin</artifactId>
                 <version>2.18.0</version>
                 <configuration>
                     <processDependencyManagementTransitive>false</processDependencyManagementTransitive>
@@ -44,17 +45,27 @@
                     <execution>
                         <id>enforce-maven</id>
                         <goals>
-                        <goal>enforce</goal>
+                            <goal>enforce</goal>
                         </goals>
                         <configuration>
-                        <rules>
-                            <requireMavenVersion>
-                                <version>${maven-required-version}</version>
-                            </requireMavenVersion>
-                        </rules>    
+                            <rules>
+                                <requireMavenVersion>
+                                    <version>${maven-required-version}</version>
+                                </requireMavenVersion>
+                            </rules>
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.14.0</version>
+                <configuration>
+                    <compilerArgs>
+                        <arg>-Xlint</arg>
+                    </compilerArgs>
+                </configuration>
             </plugin>
         </plugins>
     </build>
