@@ -15,6 +15,8 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.WebUtils;
 
+import javax.crypto.SecretKey;
+
 /**
  * Utility class for generating, parsing, and validating JSON Web Tokens (JWT).
  */
@@ -50,7 +52,7 @@ public class JwtUtils {
     /**
      * The secret key used for signing and verifying JWT.
      */
-    private final Key key;
+    private final SecretKey key;
 
     /**
      * The parser used for JWT related operations.
@@ -69,8 +71,8 @@ public class JwtUtils {
      */
     public JwtUtils(@Value("${see.app.jwtSecret}") String jwtSecret) throws WeakKeyException {
         byte[] keyBytes = Decoders.BASE64.decode(jwtSecret);
-        this.key = Keys.hmacShaKeyFor(keyBytes);
-        this.jwtParser = Jwts.parserBuilder().setSigningKey(key).build();
+        this.key = Keys. hmacShaKeyFor(keyBytes);
+        this.jwtParser = Jwts.parser().verifyWith(key).build();
     }
 
     /**
@@ -139,7 +141,7 @@ public class JwtUtils {
      * @return the username extracted from the JWT
      */
     public String getUserNameFromJwtToken(String token) {
-        return jwtParser.parseClaimsJws(token).getBody().getSubject();
+        return jwtParser.parseSignedClaims(token).getPayload().getSubject();
     }
 
     /**
@@ -163,7 +165,7 @@ public class JwtUtils {
             MalformedJwtException,
             SecurityException,
             IllegalArgumentException {
-        jwtParser.parseClaimsJws(authToken);
+        jwtParser.parseSignedClaims(authToken);
     }
 
     /**
@@ -178,10 +180,10 @@ public class JwtUtils {
      */
     public String generateToken(String username) {
         return Jwts.builder()
-                .setSubject(username)
-                .setIssuedAt(new Date())
-                .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
-                .signWith(key, SignatureAlgorithm.HS256)
+                .subject(username)
+                .issuedAt(new Date())
+                .expiration(new Date((new Date()).getTime() + jwtExpirationMs))
+                .signWith(key, Jwts.SIG.HS256)
                 .compact();
     }
 }
